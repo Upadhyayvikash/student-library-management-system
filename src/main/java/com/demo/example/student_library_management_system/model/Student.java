@@ -1,5 +1,6 @@
 package com.demo.example.student_library_management_system.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -29,6 +30,7 @@ public class Student {
     private String section;
 
     //cascade = CascadeType.ALL - whatever add/delete operations performed on the students will be updated in card also
+    @JsonManagedReference
     @OneToOne(mappedBy = "student1",cascade = CascadeType.ALL) // one student will have one card
     private Card card;
 

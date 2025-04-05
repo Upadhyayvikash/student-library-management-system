@@ -1,6 +1,7 @@
 package com.demo.example.student_library_management_system.model;
 
 import com.demo.example.student_library_management_system.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -23,9 +24,11 @@ public class Transaction {
     @Column(name="transaction_type")
     @Enumerated(value=EnumType.STRING)
     private TransactionType transactionType;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn
     private Card card;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn
     private Book book;
