@@ -7,6 +7,8 @@ import com.demo.example.student_library_management_system.model.Student;
 import com.demo.example.student_library_management_system.repository.StudentRepository;
 import com.demo.example.student_library_management_system.requestdto.StudentRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,11 +40,50 @@ public class StudentService {
         if(studentOptional.isPresent()){
             return studentOptional.get();
         }else{
-            return null;
+            throw new RuntimeException("student with id : "+id+" not found");
         }
     }
     public List<Student>  getAllStudent(){
         List<Student> studentList=studentRepository.findAll();
+        return studentList;
+    }
+    /*
+    Pagination - fetching or getting the records or data in the form of pages
+    pageno - the number of page we want to see(1,2,3,4,5,6,7,8...............)
+    pagesize - total number of records in each page(fixed for all pages)
+
+    total number of records 28, page size - 5
+
+    0th page - 1-5
+    1st page - 6-10
+    2nd page - 11-15
+    3rd page - 16-20
+    4th page - 21-25
+    5th page - 26-28
+    6th page - 0
+
+    total number of records 11, page size - 3
+    0th page - 1-3
+    1st page - 4-6
+    2nd page - 7-9
+    3rd page - 10-11
+    4th page - 0
+
+    sorting - arranging the record based on ascending order or descending order
+
+    only pagination -
+    public List<Student> getStudentByPage(int pageNo, int pageSize){
+        List<Student>studentList=studentRepository.findAll(PageRequest.of(pageNo, pageSize)).getContent();
+        return studentList;
+    }
+     */
+    public List<Student> getStudentByPage(int pageNo, int pageSize, String sortBy, String order){
+        List<Student> studentList = null;
+        if(order.equalsIgnoreCase("Ascending")) {
+           studentList = studentRepository.findAll(PageRequest.of(pageNo, pageSize, Sort.by(sortBy).ascending())).getContent();
+        }else{
+            studentList = studentRepository.findAll(PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending())).getContent();
+        }
         return studentList;
     }
     public String updateStudent(int id, StudentRequestDto studentRequestDto){
@@ -71,7 +112,16 @@ public class StudentService {
         }
     }
     public String deleteStudent(int id){
-        studentRepository.deleteById(id);
-        return "student deleted successfully";
+        Student student = findStudentById(id);
+        if(student!=null){
+            studentRepository.deleteById(id);
+            return "student deleted successfully";
+        }
+        throw new RuntimeException("student cannot found with id : "+id+" hence student not deleted");
+
+    }
+    public List<Student> getStudentByDept(String dept){
+        List<Student>studentList=studentRepository.findByDept(dept, PageRequest.of(1,2));
+        return studentList;
     }
 }
